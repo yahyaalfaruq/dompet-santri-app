@@ -4,6 +4,7 @@ export const users = pgTable("users_sample", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  displayName: text("display_name").default('Anonymous'), 
 });
 
 export const transactions = pgTable("transactions_sample", {
