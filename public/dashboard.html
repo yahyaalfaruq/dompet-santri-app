@@ -407,29 +407,24 @@
             const month = document.getElementById("month").value;
             const year = document.getElementById("year").value;
 
-            try {
-                const res = await fetch(
-                    `/api/transactions/summary?userId=${currentUserId}&month=${month}&year=${year}`
-                );
+            const res = await fetch(`/api/transactions/summary?userId=${currentUserId}&month=${month}&year=${year}`);
+            const data = await res.json();
 
-                if (!res.ok) {
-                    throw new Error('Failed to fetch summary');
-                }
+            const resultDiv = document.getElementById("summary-result");
 
-                const data = await res.json();
+            let pemasukan = 0, pengeluaran = 0;
+            data.forEach(item => {
+                if (item.category.toLowerCase() === 'pemasukan') pemasukan = item.total;
+                if (item.category.toLowerCase() === 'pengeluaran') pengeluaran = item.total;
+            });
 
-                const resultDiv = document.getElementById("summary-result");
-                resultDiv.innerHTML = `
-      <p><strong>Total Pemasukan:</strong> Rp ${data.pemasukan.toLocaleString()}</p>
-      <p><strong>Total Pengeluaran:</strong> Rp ${data.pengeluaran.toLocaleString()}</p>
-      <p><strong>Saldo:</strong> Rp ${(data.pemasukan - data.pengeluaran).toLocaleString()}</p>
+            resultDiv.innerHTML = `
+        <p><strong>Total Pemasukan:</strong> Rp ${pemasukan.toLocaleString()}</p>
+        <p><strong>Total Pengeluaran:</strong> Rp ${pengeluaran.toLocaleString()}</p>
     `;
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById("summary-result").innerHTML =
-                    '<p style="color: red;">Gagal memuat ringkasan transaksi</p>';
-            }
         });
+
+
 
         // Modal Handling
         const modal = document.getElementById('editModal');
@@ -447,13 +442,13 @@
             }
         };
 
-        // In the startEdit function:
         async function startEdit(id) {
             try {
-                const res = await fetch(`/api/transactions/${id}`);
+                const res = await fetch('/api/transactions');
                 if (!res.ok) throw new Error('Gagal fetch data transaksi');
 
-                const tx = await res.json();
+                const data = await res.json();
+                const tx = data.find(t => t.id === id);
                 if (!tx) return alert('Transaction not found.');
 
                 document.getElementById('edit-title').value = tx.title || '';
@@ -469,7 +464,6 @@
             }
         }
 
-        // In the edit form submit handler:
         document.getElementById('edit-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const title = document.getElementById('edit-title').value.trim();
@@ -482,37 +476,32 @@
                 return;
             }
 
+            console.log('Mengirim update:', { editingId, title, amount, date, category });
+
             try {
-                const res = await fetch(`/api/transactions/${editingId}`, {
+                const res = await fetch(`/api/transactions?id=${editingId}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        title,
-                        amount,
-                        date,
-                        category
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, amount, date, category })
                 });
 
+                const responseText = await res.text();
+                console.log('Response server saat update:', responseText);
                 if (!res.ok) {
-                    const errorData = await res.json();
-                    throw new Error(errorData.message || 'Gagal update transaksi');
+                    alert('Gagal update transaksi: ' + responseText);
+                    return;
                 }
 
-                const updatedTx = await res.json();
-                console.log('Transaction updated:', updatedTx);
-
                 modal.style.display = 'none';
-                editingId = null;
+                editingId = null; // reset after update
                 fetchTransactions();
             } catch (err) {
                 console.error('Error saat update transaksi:', err);
-                alert(err.message || 'Terjadi kesalahan saat mengupdate transaksi.');
+                alert('Terjadi kesalahan saat mengupdate transaksi.');
             }
         });
+
+
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
