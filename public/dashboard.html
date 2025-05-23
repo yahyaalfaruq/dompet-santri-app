@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dashboard</title>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#4a90e2" />
+
+    <style>
+        /* Modal styling modern minimalist */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transition: opacity 0.3s ease;
+            overflow: auto;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            max-width: 400px;
+            margin: auto;
+            padding: 30px 30px 25px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            position: relative;
+            animation: slideDownFade 0.3s ease forwards;
+        }
+
+        @keyframes slideDownFade {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            transition: color 0.25s ease;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        /* Buttons */
+        button {
+            background-color: #4a90e2;
+            border: none;
+            color: white;
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.25s ease;
+        }
+
+        button:hover {
+            background-color: #357ABD;
+        }
+
+        /* Spacing for Add button & Logout button */
+        #transaction-form button[type="submit"] {
+            margin-top: 12px;
+            display: block;
+            width: 100%;
+        }
+
+        #logout-btn {
+            margin-top: 30px;
+            background-color: #e74c3c;
+            width: 120px;
+        }
+
+        #logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* Inputs & selects styling */
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            margin: 8px 0 16px;
+            border: 1.8px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            border-color: #4a90e2;
+            outline: none;
+        }
+
+        /* Table styling */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-top: 30px;
+            /* space from form */
+            box-shadow: 0 6px 15px rgb(0 0 0 / 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        th,
+        td {
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1.5px solid #eee;
+        }
+
+        th {
+            background-color: #f7f9fc;
+            font-weight: 700;
+            color: #555;
+        }
+
+        td button {
+            background-color: #e74c3c;
+            padding: 6px 14px;
+            font-size: 13px;
+            border-radius: 6px;
+            margin-left: 6px;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        td button:hover {
+            background-color: #c0392b;
+        }
+
+        td button.edit-btn {
+            background-color: #27ae60;
+        }
+
+        td button.edit-btn:hover {
+            background-color: #1e8449;
+        }
+
+        /* Overall page font */
+        body {
+            margin: 40px;
+            background: #fafafa;
+            color: #222;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Dashboard</h1>
+    <form id="transaction-form">
+        <input type="text" id="title" placeholder="Title" required />
+        <input type="number" id="amount" placeholder="Amount" required />
+        <input type="date" id="date" />
+        <select id="category" required>
+            <option value="" disabled selected>Pilih kategori</option>
+            <option value="Pemasukan">pemasukan</option>
+            <option value="Pengeluaran">pengeluaran</option>
+        </select>
+
+        <button type="submit">Add</button>
+    </form>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Tanggal</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="transaction-table"></tbody>
+    </table>
+
+    <button onclick="logout()">Logout</button>
+
+    <!-- Modal Edit -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h3>Edit Transaction</h3>
+            <form id="edit-form">
+                <input type="text" id="edit-title" placeholder="Title" required />
+                <input type="number" id="edit-amount" placeholder="Amount" required />
+                <input type="date" id="edit-date" required />
+                <select id="edit-category" required>
+                    <option value="" disabled>Pilih kategori</option>
+                    <option value="Pemasukan">pemasukan</option>
+                    <option value="Pengeluaran">pengeluaran</option>
+                </select>
+                <br /><br />
+                <button type="submit">Update</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentUserId = null;
+        let editingId = null;
+
+        async function checkAuth() {
+            const res = await fetch('/api/auth/me');
+            if (!res.ok) {
+                location.href = '/login.html';
+                return;
+            }
+            const data = await res.json();
+            currentUserId = data.user.userId; // Simpan userId jika butuh
+        }
+
+        checkAuth().then(() => {
+            fetchTransactions();
+        });
+
+        function formatDateToLocal(utcDateStr) {
+            const localDate = new Date(utcDateStr);
+            const yyyy = localDate.getFullYear();
+            const mm = String(localDate.getMonth() + 1).padStart(2, '0');
+            const dd = String(localDate.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        async function fetchTransactions() {
+            const res = await fetch(`/api/transactions`);
+            const data = await res.json();
+            const tbody = document.getElementById('transaction-table');
+            tbody.innerHTML = '';
+            data.forEach(tx => {
+                const formattedDate = tx.date ? formatDateToLocal(tx.date) : '';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${tx.title}</td>
+                        <td>${tx.amount}</td>
+                        <td>${tx.category}</td>
+                        <td>${formattedDate}</td>
+                        <td>
+                            <button onclick="startEdit(${tx.id})" class="edit-btn">Edit</button>
+                            <button onclick="deleteTx(${tx.id})">Delete</button>
+                        </td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('transaction-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const amount = parseInt(document.getElementById('amount').value);
+            const date = document.getElementById('date').value;
+            const category = document.getElementById('category').value;
+
+            if (!date) {
+                date = getTodayDate();
+            }
+
+            const res = await fetch('/api/transactions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, amount, date, category })
+            });
+            if (res.ok) {
+                fetchTransactions();
+                e.target.reset();
+            }
+        });
+
+        // Fungsi untuk format tanggal ke yyyy-mm-dd
+        function getTodayDate() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        // Set default tanggal ke input date saat load halaman
+        document.getElementById('date').value = getTodayDate();
+
+
+        async function deleteTx(id) {
+            await fetch(`/api/transactions?id=${id}`, { method: 'DELETE' });
+            fetchTransactions();
+        }
+
+        async function logout() {
+            await fetch('/api/auth/logout');
+            location.href = '/login.html';
+        }
+
+        // Modal Handling
+        const modal = document.getElementById('editModal');
+        const closeModalBtn = document.getElementById('closeModal');
+
+        closeModalBtn.onclick = () => {
+            modal.style.display = 'none';
+        };
+
+        window.onclick = (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        // Start edit: buka modal dan isi data
+        async function startEdit(id) {
+            const res = await fetch('/api/transactions');
+            const data = await res.json();
+            const tx = data.find(t => t.id === id);
+            if (!tx) return alert('Transaction not found.');
+
+            document.getElementById('edit-title').value = tx.title || '';
+            document.getElementById('edit-amount').value = tx.amount || '';
+            document.getElementById('edit-date').value = tx.date ? formatDateToLocal(tx.date) : '';
+            document.getElementById('edit-category').value = tx.category || '';
+            editingId = id;
+
+            modal.style.display = 'block';
+        }
+
+        // Submit edit form
+        document.getElementById('edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('edit-title').value;
+            const amount = parseInt(document.getElementById('edit-amount').value);
+            const date = document.getElementById('edit-date').value;
+            const category = document.getElementById('edit-category').value;
+
+            if (!editingId) return;
+
+            const res = await fetch(`/api/transactions?id=${editingId}`, {
+                method: 'PUT', // biasanya update pakai PUT
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, amount, date, category })
+            });
+
+            if (res.ok) {
+                modal.style.display = 'none';
+                fetchTransactions();
+            } else {
+                alert('Failed to update transaction.');
+            }
+        });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered:', reg))
+                    .catch(err => console.error('Service Worker registration failed:', err));
+            });
+        }
+    </script>
+</body>
+
+</html>
