@@ -278,21 +278,30 @@
     <button onclick="logout()">Logout</button>
 
     <!-- Modal Edit -->
-    <div id="editModal" class="modal">
+    <!-- Modal Edit -->
+    <div id="edit-modal" class="modal" style="display: none;">
         <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
-            <h3>Edit Transaction</h3>
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2>Edit Transaksi</h2>
             <form id="edit-form">
-                <input type="text" id="edit-title" placeholder="Title" required />
-                <input type="number" id="edit-amount" placeholder="Amount" required />
-                <input type="date" id="edit-date" required />
+                <label for="edit-title">Judul:</label>
+                <input type="text" id="edit-title" required>
+
+                <label for="edit-amount">Jumlah:</label>
+                <input type="number" id="edit-amount" required>
+
+                <label for="edit-category">Kategori:</label>
                 <select id="edit-category" required>
-                    <option value="" disabled>Pilih kategori</option>
-                    <option value="Pemasukan">pemasukan</option>
-                    <option value="Pengeluaran">pengeluaran</option>
+                    <option value="" disabled selected>Pilih kategori</option>
+                    <option value="Pemasukan">Pemasukan</option>
+                    <option value="Pengeluaran">Pengeluaran</option>
                 </select>
-                <br /><br />
-                <button type="submit">Update</button>
+
+                <label for="edit-date">Tanggal:</label>
+                <input type="date" id="edit-date" required>
+
+                <button type="submit">Simpan</button>
+                <button type="button" onclick="closeEditModal()">Batal</button>
             </form>
         </div>
     </div>
@@ -427,6 +436,7 @@
 
 
         // Modal Handling
+        // ini error karena elemen dengan id="editModal" dan id="closeModal" tidak ada
         const modal = document.getElementById('editModal');
         const closeModalBtn = document.getElementById('closeModal');
 
@@ -442,65 +452,62 @@
             }
         };
 
-        async function startEdit(id) {
-            try {
-                const res = await fetch('/api/transactions');
-                if (!res.ok) throw new Error('Gagal fetch data transaksi');
-
-                const data = await res.json();
-                const tx = data.find(t => t.id === id);
-                if (!tx) return alert('Transaction not found.');
-
-                document.getElementById('edit-title').value = tx.title || '';
-                document.getElementById('edit-amount').value = tx.amount || '';
-                document.getElementById('edit-date').value = tx.date ? formatDateToLocal(tx.date) : '';
-                document.getElementById('edit-category').value = tx.category || '';
-                editingId = id;
-
-                modal.style.display = 'block';
-            } catch (err) {
-                console.error('Error saat memulai edit:', err);
-                alert('Gagal memuat data transaksi.');
-            }
+        function startEdit(id) {
+            fetch(`/api/transactions?id=${id}`, {
+                credentials: 'include'
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error('Fetch failed');
+                    return res.json();
+                })
+                .then(tx => {
+                    document.getElementById('edit-title').value = tx.title;
+                    document.getElementById('edit-amount').value = tx.amount;
+                    document.getElementById('edit-category').value = tx.category;
+                    document.getElementById('edit-date').value = tx.date?.slice(0, 10);
+                    editingId = tx.id;
+                    document.getElementById('edit-modal').style.display = 'flex';
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Gagal memuat transaksi untuk diedit.');
+                });
         }
 
-        document.getElementById('edit-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const title = document.getElementById('edit-title').value.trim();
-            const amount = parseInt(document.getElementById('edit-amount').value);
-            const date = document.getElementById('edit-date').value;
-            const category = document.getElementById('edit-category').value;
+        function closeEditModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+            editingId = null;
+        }
 
-            if (!editingId || !title || isNaN(amount) || !date || !category) {
-                alert('Semua field harus diisi dengan benar.');
-                return;
-            }
-
-            console.log('Mengirim update:', { editingId, title, amount, date, category });
-
-            try {
-                const res = await fetch(`/api/transactions?id=${editingId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, amount, date, category })
-                });
-
-                const responseText = await res.text();
-                console.log('Response server saat update:', responseText);
-                if (!res.ok) {
-                    alert('Gagal update transaksi: ' + responseText);
-                    return;
-                }
-
-                modal.style.display = 'none';
-                editingId = null; // reset after update
-                fetchTransactions();
-            } catch (err) {
-                console.error('Error saat update transaksi:', err);
-                alert('Terjadi kesalahan saat mengupdate transaksi.');
+        // Optional: klik luar modal nutup modal
+        window.addEventListener('click', function (event) {
+            const modal = document.getElementById('edit-modal');
+            if (event.target === modal) {
+                closeEditModal();
             }
         });
 
+        document.getElementById('edit-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const title = document.getElementById('edit-title').value;
+            const amount = parseFloat(document.getElementById('edit-amount').value);
+            const category = document.getElementById('edit-category').value;
+            const date = document.getElementById('edit-date').value;
+
+            const res = await fetch(`/api/transactions?id=${editingId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, amount, category, date }),
+                credentials: 'include'
+            });
+
+            if (res.ok) {
+                closeEditModal();
+                fetchTransactions();
+            } else {
+                alert('Gagal mengedit transaksi.');
+            }
+        });
 
 
         if ('serviceWorker' in navigator) {
