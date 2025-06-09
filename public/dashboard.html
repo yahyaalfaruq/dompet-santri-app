@@ -260,8 +260,6 @@
 
     <div id="summary-result" style="margin-top:20px;"></div>
 
-
-
     <table border="1">
         <thead>
             <tr>
@@ -278,8 +276,7 @@
     <button onclick="logout()">Logout</button>
 
     <!-- Modal Edit -->
-    <!-- Modal Edit -->
-    <div id="edit-modal" class="modal" style="display: none;">
+    <div id="edit-modal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeEditModal()">&times;</span>
             <h2>Edit Transaksi</h2>
@@ -317,7 +314,7 @@
                 return;
             }
             const data = await res.json();
-            currentUserId = data.user.userId; // Simpan userId jika butuh
+            currentUserId = data.user.userId;
         }
 
         checkAuth().then(() => {
@@ -345,8 +342,8 @@
                         <td>${tx.category}</td>
                         <td>${formattedDate}</td>
                         <td>
-                            <button onclick="startEdit(${tx.id})" class="edit-btn">Edit</button>
-                            <button onclick="deleteTx(${tx.id})">Delete</button>
+                            <button onclick="startEdit('${tx.id}')" class="edit-btn">Edit</button>
+                            <button onclick="deleteTx('${tx.id}')">Delete</button>
                         </td>`;
                 tbody.appendChild(tr);
             });
@@ -356,7 +353,7 @@
             e.preventDefault();
             const title = document.getElementById('title').value;
             const amount = parseInt(document.getElementById('amount').value);
-            const date = document.getElementById('date').value;
+            let date = document.getElementById('date').value;
             const category = document.getElementById('category').value;
 
             if (!date) {
@@ -386,8 +383,6 @@
             }
         });
 
-
-        // Fungsi untuk format tanggal ke yyyy-mm-dd
         function getTodayDate() {
             const today = new Date();
             const yyyy = today.getFullYear();
@@ -396,9 +391,7 @@
             return `${yyyy}-${mm}-${dd}`;
         }
 
-        // Set default tanggal ke input date saat load halaman
         document.getElementById('date').value = getTodayDate();
-
 
         async function deleteTx(id) {
             await fetch(`/api/transactions?id=${id}`, { method: 'DELETE' });
@@ -428,50 +421,32 @@
             });
 
             resultDiv.innerHTML = `
-        <p><strong>Total Pemasukan:</strong> Rp ${pemasukan.toLocaleString()}</p>
-        <p><strong>Total Pengeluaran:</strong> Rp ${pengeluaran.toLocaleString()}</p>
-    `;
+                <p><strong>Total Pemasukan:</strong> Rp ${pemasukan.toLocaleString()}</p>
+                <p><strong>Total Pengeluaran:</strong> Rp ${pengeluaran.toLocaleString()}</p>
+            `;
         });
 
-
-
-        // Modal Handling
-        // ini error karena elemen dengan id="editModal" dan id="closeModal" tidak ada
-        const modal = document.getElementById('editModal');
-        const closeModalBtn = document.getElementById('closeModal');
-
-        closeModalBtn.onclick = () => {
-            modal.style.display = 'none';
-            editingId = null; // reset
-        };
-
-        window.onclick = (event) => {
-            if (event.target === modal) {
-                modal.style.display = 'none';
-                editingId = null; // reset
+        async function startEdit(id) {
+            try {
+                const res = await fetch(`/api/transactions?id=${id}`);
+                if (!res.ok) throw new Error('Failed to fetch transaction');
+                
+                const tx = await res.json();
+                document.getElementById('edit-title').value = tx.title;
+                document.getElementById('edit-amount').value = tx.amount;
+                document.getElementById('edit-category').value = tx.category;
+                
+                // Format date properly for the input field
+                const txDate = tx.date ? new Date(tx.date) : new Date();
+                const formattedDate = txDate.toISOString().split('T')[0];
+                document.getElementById('edit-date').value = formattedDate;
+                
+                editingId = id;
+                document.getElementById('edit-modal').style.display = 'block';
+            } catch (err) {
+                console.error('Error fetching transaction:', err);
+                alert('Gagal memuat transaksi untuk diedit.');
             }
-        };
-
-        function startEdit(id) {
-            fetch(`/api/transactions?id=${id}`, {
-                credentials: 'include'
-            })
-                .then(res => {
-                    if (!res.ok) throw new Error('Fetch failed');
-                    return res.json();
-                })
-                .then(tx => {
-                    document.getElementById('edit-title').value = tx.title;
-                    document.getElementById('edit-amount').value = tx.amount;
-                    document.getElementById('edit-category').value = tx.category;
-                    document.getElementById('edit-date').value = tx.date?.slice(0, 10);
-                    editingId = tx.id;
-                    document.getElementById('edit-modal').style.display = 'flex';
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert('Gagal memuat transaksi untuk diedit.');
-                });
         }
 
         function closeEditModal() {
@@ -479,7 +454,6 @@
             editingId = null;
         }
 
-        // Optional: klik luar modal nutup modal
         window.addEventListener('click', function (event) {
             const modal = document.getElementById('edit-modal');
             if (event.target === modal) {
@@ -489,26 +463,30 @@
 
         document.getElementById('edit-form').addEventListener('submit', async function (e) {
             e.preventDefault();
+            
             const title = document.getElementById('edit-title').value;
             const amount = parseFloat(document.getElementById('edit-amount').value);
             const category = document.getElementById('edit-category').value;
             const date = document.getElementById('edit-date').value;
 
-            const res = await fetch(`/api/transactions?id=${editingId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, amount, category, date }),
-                credentials: 'include'
-            });
+            try {
+                const res = await fetch(`/api/transactions?id=${editingId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, amount, category, date })
+                });
 
-            if (res.ok) {
-                closeEditModal();
-                fetchTransactions();
-            } else {
+                if (res.ok) {
+                    closeEditModal();
+                    fetchTransactions();
+                } else {
+                    throw new Error('Failed to update transaction');
+                }
+            } catch (err) {
+                console.error('Error updating transaction:', err);
                 alert('Gagal mengedit transaksi.');
             }
         });
-
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
