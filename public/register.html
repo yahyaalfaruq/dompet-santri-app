@@ -1,143 +1,630 @@
 <!DOCTYPE html>
-<html>
+<html lang="id" data-theme="light">
 
 <head>
-    <title>Register</title>
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#4a90e2" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daftar Akun Santri | Dompet Santri</title>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#244D3E" />
+  <style>
+    :root,
+    [data-theme="light"] {
+      --bg-canvas: #F5F2EB;
+      --bg-surface: #FFFFFF;
+      --bg-subtle: #EAE5D9;
+      --bg-accent-soft: #E7EFEA;
+      --text-primary: #1B2620;
+      --text-secondary: #4A5850;
+      --border-color: #D0C9B8;
+      --border-strong: #244D3E;
+      --brand-primary: #244D3E;
+      --brand-hover: #1B3B2F;
+      --brand-active: #142D24;
+      --focus-ring: #1D6348;
+      --status-error-bg: #FEE2E2;
+      --status-error-text: #7F1D1D;
+      --status-error-border: #FCA5A5;
+      --status-success-bg: #DCFCE7;
+      --status-success-text: #14532D;
+      --status-success-border: #86EFAC;
+      --card-shadow: 0 2px 6px rgba(27, 38, 32, 0.06);
+    }
 
-    <style>
-        /* Reset dasar */
-        * {
-            box-sizing: border-box;
-        }
+    [data-theme="dark"] {
+      --bg-canvas: #111815;
+      --bg-surface: #19231E;
+      --bg-subtle: #223029;
+      --bg-accent-soft: #1F332A;
+      --text-primary: #EDF2EF;
+      --text-secondary: #A3B5AC;
+      --border-color: #2D3E36;
+      --border-strong: #49876E;
+      --brand-primary: #2E7D5B;
+      --brand-hover: #38916B;
+      --brand-active: #25664A;
+      --focus-ring: #52B788;
+      --status-error-bg: #3B1818;
+      --status-error-text: #FECACA;
+      --status-error-border: #7F1D1D;
+      --status-success-bg: #143824;
+      --status-success-text: #BBF7D0;
+      --status-success-border: #22543D;
+      --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
 
-        body {
-            background: #f0f2f5;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: #333;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        form {
-            background: white;
-            padding: 2.5rem 3rem;
-            border-radius: 12px;
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-            width: 320px;
-            text-align: center;
-        }
+    html,
+    body {
+      min-height: 100%;
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
 
-        h1 {
-            margin-bottom: 1.5rem;
-            font-weight: 700;
-            color: #222;
-            font-size: 2rem;
-            letter-spacing: 1px;
-        }
+    a[href],
+    button,
+    summary,
+    select,
+    label[for],
+    input[type="checkbox"],
+    input[type="radio"],
+    [role="button"],
+    [role="tab"],
+    [role="switch"] {
+      cursor: pointer;
+    }
 
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 0.85rem 1rem;
-            margin-bottom: 1.25rem;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
+    button:disabled,
+    input:disabled,
+    select:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
 
-        input[type="text"]:focus,
-        input[type="password"]:focus {
-            outline: none;
-            border-color: #4a90e2;
-            box-shadow: 0 0 6px rgba(74, 144, 226, 0.5);
-        }
+    :focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
 
-        button {
-            width: 100%;
-            background-color: #4a90e2;
-            color: white;
-            font-weight: 600;
-            font-size: 1.1rem;
-            padding: 0.85rem 0;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 6px 12px rgba(74, 144, 226, 0.4);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        }
+    .page-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
 
-        button:hover {
-            background-color: #357ABD;
-            box-shadow: 0 8px 16px rgba(53, 122, 189, 0.6);
-        }
+    header.top-bar {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
 
-        .login-link {
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: #555;
-            text-align: center;
-        }
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1.05rem;
+      min-height: 44px;
+    }
 
-        .login-link a {
-            color: #4a90e2;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
+    .brand-link img {
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: #F5F2EB;
+    }
 
-        .login-link a:hover {
-            color: #357ABD;
-            text-decoration: underline;
-        }
-    </style>
+    nav.top-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--text-primary);
+      border: 1px solid transparent;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .nav-link:hover {
+      background-color: var(--bg-subtle);
+      border-color: var(--border-color);
+    }
+
+    .nav-link[aria-current="page"] {
+      background-color: var(--bg-accent-soft);
+      border-color: var(--border-strong);
+      font-weight: 700;
+    }
+
+    .theme-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 10px;
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .theme-btn:hover {
+      background-color: var(--bg-subtle);
+      border-color: var(--border-strong);
+    }
+
+    .theme-btn:active {
+      transform: translateY(1px);
+    }
+
+    main.auth-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+    }
+
+    .ledger-card {
+      width: 100%;
+      max-width: 460px;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-top: 4px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 32px 28px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .ledger-header {
+      text-align: center;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+      border-bottom: 3px double var(--border-color);
+    }
+
+    .logo-frame {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 4px;
+      background-color: #F5F2EB;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-frame img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      display: block;
+    }
+
+    h1 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 0.94rem;
+      color: var(--text-secondary);
+    }
+
+    .status-banner {
+      display: none;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 18px;
+      font-size: 0.92rem;
+      font-weight: 500;
+    }
+
+    .status-banner.error {
+      display: block;
+      background-color: var(--status-error-bg);
+      color: var(--status-error-text);
+      border: 1px solid var(--status-error-border);
+    }
+
+    .status-banner.success {
+      display: block;
+      background-color: var(--status-success-bg);
+      color: var(--status-success-text);
+      border: 1px solid var(--status-success-border);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.92rem;
+      margin-bottom: 6px;
+      color: var(--text-primary);
+    }
+
+    .field-hint {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .form-input {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 14px;
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--text-primary);
+      background-color: var(--bg-canvas);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .form-input::placeholder {
+      color: var(--text-secondary);
+      opacity: 0.8;
+    }
+
+    .form-input:hover {
+      border-color: var(--border-strong);
+    }
+
+    .form-input:focus {
+      background-color: var(--bg-surface);
+      border-color: var(--focus-ring);
+    }
+
+    .primary-btn {
+      width: 100%;
+      min-height: 46px;
+      margin-top: 6px;
+      padding: 12px 18px;
+      background-color: var(--brand-primary);
+      color: #FFFFFF;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      transition: background-color 0.15s ease;
+    }
+
+    .primary-btn:hover:not(:disabled) {
+      background-color: var(--brand-hover);
+    }
+
+    .primary-btn:active:not(:disabled) {
+      background-color: var(--brand-active);
+      transform: translateY(1px);
+    }
+
+    .auth-footer-links {
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+    }
+
+    .auth-footer-links a {
+      color: var(--text-primary);
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      padding: 4px 6px;
+      border-radius: 4px;
+    }
+
+    .auth-footer-links a:hover {
+      background-color: var(--bg-subtle);
+    }
+
+    footer.site-footer {
+      text-align: center;
+      padding: 18px 20px;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border-color);
+    }
+
+    @media (max-width: 480px) {
+      .ledger-card {
+        padding: 24px 18px;
+      }
+
+      header.top-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      nav.top-nav {
+        justify-content: space-between;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <form id="register-form">
-        <h1>Register</h1>
-        <input type="text" id="username" placeholder="Username" required />
-        <input type="text" id="displayName" placeholder="Display Name" required />
-        <input type="password" id="password" placeholder="Password" required />
-        <button type="submit">Register</button>
-        <div class="login-link">
-            Sudah punya akun? <a href="/login.html">Login</a>
+  <div class="page-shell">
+    <header class="top-bar">
+      <a href="/login.html" class="brand-link">
+        <img src="/dompet-santri.png" alt="Logo Dompet Santri" width="36" height="36" fetchpriority="high" />
+        <span>Dompet Santri</span>
+      </a>
+      <nav class="top-nav" aria-label="Navigasi Autentikasi">
+        <a href="/login.html" class="nav-link">Masuk</a>
+        <a href="/register.html" class="nav-link" aria-current="page">Daftar Akun</a>
+        <button
+          type="button"
+          id="theme-toggle"
+          class="theme-btn"
+          aria-pressed="false"
+          aria-label="Aktifkan Mode Malam"
+          title="Aktifkan Mode Malam"
+        >
+          <svg
+            id="icon-sun"
+            aria-hidden="true"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="display:none;"
+          >
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg
+            id="icon-moon"
+            aria-hidden="true"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </nav>
+    </header>
+
+    <main class="auth-main">
+      <section class="ledger-card" aria-labelledby="register-heading">
+        <div class="ledger-header">
+          <div class="logo-frame">
+            <img src="/dompet-santri.png" alt="Lambang Kopiah dan Dompet Santri" width="64" height="64" fetchpriority="high" />
+          </div>
+          <h1 id="register-heading">Buka Buku Kas Santri Baru</h1>
+          <p class="subtitle">Buat akun pribadi untuk mulai mencatat pemasukan dan pengeluaran</p>
         </div>
-    </form>
 
-    <script>
-        document.getElementById('register-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const displayName = document.getElementById('displayName').value;
-            const password = document.getElementById('password').value;
-            const res = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, displayName })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                alert('Register success, silakan login.');
-                location.href = '/login.html';
-            } else {
-                alert(data.error);
-            }
+        <div id="status-banner" class="status-banner" role="alert" aria-live="polite"></div>
+
+        <form id="register-form" novalidate>
+          <div class="form-group">
+            <label for="displayName">Nama Lengkap Santri</label>
+            <input
+              type="text"
+              id="displayName"
+              name="displayName"
+              class="form-input"
+              placeholder="Masukkan nama lengkap Anda"
+              autocomplete="name"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              class="form-input"
+              placeholder="Minimal 3 karakter (huruf atau angka)"
+              autocomplete="username"
+              required
+            />
+            <span class="field-hint">Digunakan saat masuk ke aplikasi (tanpa spasi).</span>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Kata Sandi</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-input"
+              placeholder="Minimal 6 karakter"
+              autocomplete="new-password"
+              required
+            />
+          </div>
+
+          <button type="submit" id="submit-btn" class="primary-btn">
+            Daftarkan Akun Santri
+          </button>
+        </form>
+
+        <div class="auth-footer-links">
+          Sudah memiliki akun buku kas? <a href="/login.html">Masuk di sini</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Dompet Santri: Pencatatan Uang Saku &amp; Buku Kas Mandiri Pondok Pesantren</p>
+    </footer>
+  </div>
+
+  <script>
+    (function initTheme() {
+      const saved = localStorage.getItem('dompet-santri-theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const initial = saved || (prefersDark ? 'dark' : 'light');
+      applyTheme(initial);
+    })();
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      const btn = document.getElementById('theme-toggle');
+      const iconSun = document.getElementById('icon-sun');
+      const iconMoon = document.getElementById('icon-moon');
+      if (btn && iconSun && iconMoon) {
+        const isDark = theme === 'dark';
+        const actionLabel = isDark ? 'Aktifkan Mode Terang' : 'Aktifkan Mode Malam';
+        btn.setAttribute('aria-pressed', String(isDark));
+        btn.setAttribute('aria-label', actionLabel);
+        btn.setAttribute('title', actionLabel);
+        iconSun.style.display = isDark ? 'block' : 'none';
+        iconMoon.style.display = isDark ? 'none' : 'block';
+      }
+    }
+
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('dompet-santri-theme', next);
+      applyTheme(next);
+    });
+
+    function showStatus(message, type) {
+      const banner = document.getElementById('status-banner');
+      banner.textContent = message;
+      banner.className = 'status-banner ' + type;
+    }
+
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const displayNameInput = document.getElementById('displayName');
+      const usernameInput = document.getElementById('username');
+      const passwordInput = document.getElementById('password');
+      const submitBtn = document.getElementById('submit-btn');
+
+      const displayName = displayNameInput.value.trim();
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value;
+
+      if (displayName.length < 2) {
+        showStatus('Nama lengkap santri minimal terdiri dari 2 karakter.', 'error');
+        displayNameInput.focus();
+        return;
+      }
+
+      if (username.length < 3) {
+        showStatus('Username minimal terdiri dari 3 karakter.', 'error');
+        usernameInput.focus();
+        return;
+      }
+
+      if (password.length < 6) {
+        showStatus('Kata sandi minimal terdiri dari 6 karakter.', 'error');
+        passwordInput.focus();
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sedang mendaftarkan akun...';
+      showStatus('Sedang menyiapkan buku kas baru Anda...', 'success');
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, displayName }),
         });
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker registered:', reg))
-                    .catch(err => console.error('Service Worker registration failed:', err));
-            });
+        const data = await res.json();
+        if (res.ok) {
+          showStatus('Pendaftaran berhasil! Mengalihkan ke halaman masuk...', 'success');
+          setTimeout(() => {
+            window.location.href = '/login.html?registered=1';
+          }, 600);
+        } else {
+          showStatus(data.error || 'Gagal mendaftarkan akun.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Daftarkan Akun Santri';
         }
-    </script>
+      } catch {
+        showStatus('Gagal terhubung ke server. Periksa koneksi Anda lalu coba kembali.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Daftarkan Akun Santri';
+      }
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
 
 </html>

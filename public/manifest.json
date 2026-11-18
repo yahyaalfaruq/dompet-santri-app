@@ -1,18 +1,18 @@
 {
-  "name": "Dompet Santri App",
-  "short_name": "TxApp",
+  "name": "Dompet Santri - Buku Kas Santri",
+  "short_name": "DompetSantri",
   "start_url": "/login.html",
   "display": "standalone",
-  "background_color": "#fafafa",
-  "theme_color": "#4a90e2",
+  "background_color": "#F5F2EB",
+  "theme_color": "#244D3E",
   "icons": [
     {
-      "src": "./dompet-santri.png",
+      "src": "/dompet-santri.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "./dompet-santri.png",
+      "src": "/dompet-santri.png",
       "sizes": "512x512",
       "type": "image/png"
     }

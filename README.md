@@ -1,40 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Dompet Santri - Aplikasi Buku Kas & Uang Saku Santri
 
-## Getting Started
+Aplikasi pencatatan uang saku harian (pemasukan kiriman dan pengeluaran kebutuhan) untuk santri pondok pesantren, dibangun dengan Next.js, TypeScript, Drizzle ORM, dan validasi Zod.
 
-First, run the development server:
+## Fitur Utama
+
+1. **Autentikasi Santri (JWT HttpOnly Cookie):**
+   - Pendaftaran akun santri baru (`POST /api/auth/register`).
+   - Masuk ke lembar buku kas (`POST /api/auth/login`) dan keluar sesi (`POST /api/auth/logout`).
+   - Pemeriksaan sesi aktif beserta profil nama santri (`GET /api/auth/me`).
+2. **Manajemen Buku Kas Transaksi Lengkap (CRUD):**
+   - Daftar seluruh catatan transaksi milik santri (`GET /api/transactions`).
+   - Detail satu catatan transaksi berdasarkan ID (`GET /api/transactions?id=:id`).
+   - Pencatatan transaksi baru (`POST /api/transactions`).
+   - Pembaruan catatan transaksi (`PUT /api/transactions?id=:id`).
+   - Penghapusan catatan transaksi (`DELETE /api/transactions?id=:id`).
+3. **Ringkasan Saldo & Filter Periode:**
+   - Akumulasi pemasukan, pengeluaran, dan sisa saldo bersih (`GET /api/transactions/summary?month=:m&year=:y`).
+   - Penyaringan berdasarkan bulan, tahun, jenis catatan (Pemasukan/Pengeluaran), dan pencarian kata kunci.
+4. **Dukungan Database Ganda (PostgreSQL & SQLite Lokal):**
+   - Menggunakan Neon PostgreSQL apabila variabel lingkungan `DATABASE_URL` (`postgresql://...`) tersedia.
+   - Otomatis beralih ke database SQLite lokal (`file:./local.db` melalui `@libsql/client`) beserta akun contoh (`admin` / `password123`) apabila `DATABASE_URL` belum dikonfigurasi.
+5. **Antarmuka Buku Kas Pesantren (Light & Dark Mode):**
+   - Mengikuti panduan arah desain di `DESIGN.md` (palet kertas buku kas hangat `#F5F2EB` dan hijau pesantren `#244D3E` selaras dengan logo `public/dompet-santri.png`).
+   - Mendukung Mode Terang dan Mode Malam Asrama serta aksesibilitas keyboard penuh.
+
+## Menjalankan Aplikasi
 
 ```bash
+# Pasang dependensi
+npm install
+
+# Jalankan server pengembangan
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Atau bangun dan jalankan versi produksi
+npm run build
+npm run start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+Buka `http://localhost:3000` pada peramban Anda.
